@@ -1,7 +1,8 @@
+import Dashboard from '@components/Dashboard';
+import DashboardLayout from '@layouts/DashboardLayout';
 import Head from 'next/head';
-import LandingPage from '@components/LandingPage';
 
-export default function HomePage() {
+export default function DashboardPage() {
   return (
     <>
       <Head>
@@ -15,7 +16,9 @@ export default function HomePage() {
       </Head>
 
       <main>
-        <LandingPage />
+        <DashboardLayout>
+          <Dashboard />
+        </DashboardLayout>
       </main>
     </>
   );
