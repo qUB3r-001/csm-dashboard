@@ -1,4 +1,5 @@
-import { Button, Icon, Spacer, Text, VStack } from '@chakra-ui/react';
+/* eslint-disable react/require-default-props */
+import { Button, Icon, Link, Spacer, Text, VStack } from '@chakra-ui/react';
 import { IconType } from 'react-icons/lib';
 import { MdOutlineSpaceDashboard, MdPlaylistPlay } from 'react-icons/md';
 import { PiCubeFocus } from 'react-icons/pi';
@@ -7,6 +8,10 @@ interface SidebarItemProps {
   icon: IconType;
   label: string;
 }
+
+type SidebarLinkItemProps = SidebarItemProps & {
+  href: string;
+};
 
 function SidebarItem({ icon, label }: SidebarItemProps) {
   return (
@@ -19,6 +24,22 @@ function SidebarItem({ icon, label }: SidebarItemProps) {
         {label}
       </Text>
     </Button>
+  );
+}
+
+function SidebarLinkItem({ icon, label, href }: SidebarLinkItemProps) {
+  return (
+    <Link href={href} isExternal>
+      <Button
+        variant="sidebarButton"
+        justifyContent={['center', 'center', 'center', 'start']}
+      >
+        <Icon as={icon} fontSize="20" />
+        <Text fontWeight="medium" display={['none', 'none', 'none', 'block']}>
+          {label}
+        </Text>
+      </Button>
+    </Link>
   );
 }
 
@@ -35,7 +56,11 @@ function Sidebar() {
       <SidebarItem icon={MdOutlineSpaceDashboard} label="Overview" />
       <SidebarItem icon={MdPlaylistPlay} label="Video Segmentation" />
       <Spacer />
-      <SidebarItem icon={PiCubeFocus} label="Submit Feedback" />
+      <SidebarLinkItem
+        icon={PiCubeFocus}
+        label="Submit Feedback"
+        href="https://forms.gle/s92zrEyfL7WcibxCA"
+      />
     </VStack>
   );
 }

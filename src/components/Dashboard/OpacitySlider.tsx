@@ -7,7 +7,12 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-function OpacitySlider() {
+interface OpacitySliderProps {
+  opacityValue: number;
+  handleChange: (val: number) => void;
+}
+
+function OpacitySlider({ opacityValue, handleChange }: OpacitySliderProps) {
   return (
     <Box
       width="44"
@@ -29,7 +34,13 @@ function OpacitySlider() {
       >
         Mask Opacity
       </Text>
-      <Slider aria-label="slider-ex-1" min={0} max={99}>
+      <Slider
+        aria-label="slider-ex-1"
+        min={0}
+        max={99}
+        onChange={handleChange}
+        value={opacityValue}
+      >
         <SliderTrack>
           <SliderFilledTrack />
         </SliderTrack>

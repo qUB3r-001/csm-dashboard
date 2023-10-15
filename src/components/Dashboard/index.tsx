@@ -3,12 +3,16 @@
 import { Flex, SimpleGrid } from '@chakra-ui/react';
 import { MarkedDots, Point } from '@typings/index';
 import { useEffect, useRef, useState, MouseEvent } from 'react';
+import { BiSolidEraser } from 'react-icons/bi';
+import { CgPathCrop } from 'react-icons/cg';
 import { GrRotateLeft } from 'react-icons/gr';
 import { MdOutlinePanTool } from 'react-icons/md';
 import { PiBroomDuotone } from 'react-icons/pi';
 import { TbChartGridDots } from 'react-icons/tb';
+import { findInteriorOfPointInArray } from 'utils/2dSpaceUtils';
 import ActionButton from './ActionButton';
 import LayerSelector from './LayerSelector';
+import OpacitySlider from './OpacitySlider';
 
 import SessionHeader from './SessionHeader';
 
@@ -19,11 +23,14 @@ function Dashboard() {
 
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [lastMousePos, setLastMousePos] = useState<Point>({ x: 0, y: 0 });
-  const [panOffset, setPanOffset] = useState<Point>({ x: 100, y: 100 });
+  const [panOffset, setPanOffset] = useState<Point>({ x: 150, y: 50 });
 
   const [isPanningEnabled, setIsPanningEnabled] = useState<boolean>(false);
   const [isMarkingEnabled, setIsMarkingEnabled] = useState<boolean>(false);
+  const [isEraserEnabled, setIsEraserEnabled] = useState<boolean>(false);
   const [isObjectLayer, setIsObjectLayer] = useState<boolean>(true);
+  const [isMaskGenerated, setIsMaskGenerated] = useState<boolean>(false);
+  const [opacityValue, setOpacityValue] = useState<number>(99);
 
   const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
 
@@ -34,6 +41,7 @@ function Dashboard() {
     setLastMousePos({ x: e.clientX, y: e.clientY });
 
     if (isMarkingEnabled) {
+      console.log('point marked');
       const isInsideImageX =
         e.clientX -
           canvasRef.current!.getBoundingClientRect().left -
@@ -73,6 +81,22 @@ function Dashboard() {
         console.log('clicked outside image');
       }
     }
+
+    if (isEraserEnabled) {
+      console.log('erase point');
+      setMarkedDots(
+        findInteriorOfPointInArray(markedDots, {
+          x:
+            e.clientX -
+            canvasRef.current!.getBoundingClientRect().left -
+            panOffset.x,
+          y:
+            e.clientY -
+            canvasRef.current!.getBoundingClientRect().top -
+            panOffset.y,
+        }),
+      );
+    }
   };
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -110,8 +134,22 @@ function Dashboard() {
     setIsObjectLayer((prev) => !prev);
   };
 
+  const toggleEraser = () => {
+    setIsEraserEnabled((prev) => !prev);
+  };
+
   const clearAllDots = () => {
     setMarkedDots([]);
+  };
+
+  const toggleMaskGenerated = () => {
+    setIsMaskGenerated((prev) => !prev);
+  };
+
+  const changeOpacityValue = (currValue: number) => {
+    if (isMaskGenerated) {
+      setOpacityValue(currValue);
+    }
   };
 
   // load the image from url
@@ -131,7 +169,7 @@ function Dashboard() {
         loadImage.onload = () => {
           const newImageWidth = 300;
           const newImageHeight = (300 * loadImage.height) / loadImage.width;
-
+          console.log('image redrawn');
           ctx.drawImage(
             loadImage,
             panOffset.x,
@@ -154,9 +192,31 @@ function Dashboard() {
             ctx.fill();
           });
         };
+
+        if (isMaskGenerated) {
+          const maskedImage = new Image();
+          maskedImage.src = 'https://i.imgur.com/XKAdtN1.jpeg';
+
+          maskedImage.onload = () => {
+            const newMaskedImageWidth = 300;
+            const newMaskedImageHeight =
+              (300 * maskedImage.height) / maskedImage.width;
+            console.log('masked image redrawn');
+            ctx.globalAlpha = opacityValue / 100;
+            ctx.drawImage(
+              maskedImage,
+              panOffset.x,
+              panOffset.y,
+              newMaskedImageWidth,
+              newMaskedImageHeight,
+            );
+            ctx.globalAlpha = 1;
+            imageRef.current = loadImage;
+          };
+        }
       }
     }
-  }, [panOffset, markedDots]);
+  }, [panOffset, markedDots, isMaskGenerated, opacityValue]);
 
   return (
     <Flex flex="1" p="4" direction="column" gap="6">
@@ -171,11 +231,18 @@ function Dashboard() {
           top="6"
           left="6"
         >
-          <ActionButton icon={MdOutlinePanTool} handleClick={togglePan} />
           <ActionButton icon={TbChartGridDots} handleClick={toggleMarking} />
           <ActionButton icon={GrRotateLeft} handleClick={undoMarkedDots} />
+          <ActionButton icon={BiSolidEraser} handleClick={toggleEraser} />
           <ActionButton icon={PiBroomDuotone} handleClick={clearAllDots} />
+          <ActionButton icon={CgPathCrop} handleClick={toggleMaskGenerated} />
+          <ActionButton icon={MdOutlinePanTool} handleClick={togglePan} />
         </SimpleGrid>
+
+        <OpacitySlider
+          handleChange={changeOpacityValue}
+          opacityValue={opacityValue}
+        />
 
         <LayerSelector
           isObjectLayer={isObjectLayer}

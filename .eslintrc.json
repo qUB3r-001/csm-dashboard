@@ -11,7 +11,7 @@
     "project": ["./tsconfig.json"]
   },
   "rules": {
-    "no-console": "error",
+    "no-console": "warn",
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
     "prettier/prettier": "error"
