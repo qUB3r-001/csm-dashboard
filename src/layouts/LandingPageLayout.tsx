@@ -1,4 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
+import { BgSvgBottom, BgSvgTop } from '@components/common';
 import { ReactNode } from 'react';
 
 function LandingPageLayout({ children }: { children: ReactNode }) {
@@ -10,15 +11,14 @@ function LandingPageLayout({ children }: { children: ReactNode }) {
       alignItems="center"
       position="relative"
     >
-      <Box
-        position="absolute"
-        width="full"
-        height="full"
-        bgGradient="linear(to-b, teal.100, white, white, white, teal.100)"
-        opacity="0.75"
-        zIndex={-10}
-        overflow="visible"
-      />
+      <Box position="absolute" top="0" left="0" width="full" zIndex={-10}>
+        <BgSvgTop />
+      </Box>
+
+      <Box position="absolute" bottom="0" left="0" width="full" zIndex={-10}>
+        <BgSvgBottom />
+      </Box>
+
       {children}
     </Flex>
   );

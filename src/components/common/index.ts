@@ -1,4 +1,5 @@
-/* eslint-disable import/prefer-default-export */
 import CSMLogo from './icons/csmLogo';
+import BgSvgBottom from './icons/bgSvgTop';
+import BgSvgTop from './icons/bgSvgBottom';
 
-export { CSMLogo };
+export { CSMLogo, BgSvgTop, BgSvgBottom };

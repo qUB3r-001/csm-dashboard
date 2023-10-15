@@ -1,4 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
+import { BgSvgBottom, BgSvgTop } from '@components/common';
 import Sidebar from '@components/Sidebar';
 import Topbar from '@components/Topbar';
 import { ReactNode } from 'react';
@@ -12,17 +13,13 @@ function DashboardLayout({ children }: { children: ReactNode }) {
       direction="column"
       gap="6"
     >
-      <Box
-        position="absolute"
-        width="full"
-        height="full"
-        top="0"
-        left="0"
-        bgGradient="linear(to-b, teal.100, white, white, white, teal.100)"
-        opacity="0.75"
-        zIndex={-10}
-        overflow="visible"
-      />
+      <Box position="absolute" top="0" left="0" width="full" zIndex={-10}>
+        <BgSvgTop />
+      </Box>
+
+      <Box position="absolute" bottom="0" left="0" width="full" zIndex={-10}>
+        <BgSvgBottom />
+      </Box>
 
       <Topbar />
       <Flex flex="1">

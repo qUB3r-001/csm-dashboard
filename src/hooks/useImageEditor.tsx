@@ -146,12 +146,12 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
         setMarkedDots(
           findInteriorOfPointInArray(markedDots, {
             x:
-              e.clientX -
-              canvasRef.current!.getBoundingClientRect().left -
+              (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
+                scale -
               panOffset.x,
             y:
-              e.clientY -
-              canvasRef.current!.getBoundingClientRect().top -
+              (e.clientY - canvasRef.current!.getBoundingClientRect().top) /
+                scale -
               panOffset.y,
           }),
         );

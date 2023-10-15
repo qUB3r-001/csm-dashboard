@@ -5,18 +5,17 @@ import { BiBell, BiSolidUser } from 'react-icons/bi';
 function Topbar() {
   return (
     <Flex
-      border="1px"
-      borderColor="white"
-      borderRadius="md"
+      borderRadius="lg"
       p="4"
       m="6"
-      outline="1px"
       alignItems="center"
       gap="6"
-      bg="whiteAlpha.700"
+      borderWidth="1px"
+      borderColor="white"
+      bg="whiteAlpha.600"
     >
       <CSMLogo />
-      <Spacer />
+      <Spacer color="transparent" />
       <Box>
         <Select placeholder="Instructions" variant="topbarSelect">
           <option>Capture instructions</option>
