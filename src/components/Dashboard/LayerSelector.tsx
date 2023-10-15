@@ -1,15 +1,18 @@
 import { Switch, Text, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
 
-function LayerSelector() {
-  const [isObjectLayer, setIsObjectLayer] = useState(true);
+interface LayerSelectorProps {
+  handleChange: () => void;
+  isObjectLayer: boolean;
+}
 
+function LayerSelector({ handleChange, isObjectLayer }: LayerSelectorProps) {
   return (
     <VStack position="absolute" right="6" top="6" gap="4" p="4" width="28">
       <Switch
+        color="transparent"
         variant="doubleColor"
         size="lg"
-        onChange={() => setIsObjectLayer((prev) => !prev)}
+        onChange={handleChange}
         isChecked={isObjectLayer}
       />
       <Text fontWeight="semibold">

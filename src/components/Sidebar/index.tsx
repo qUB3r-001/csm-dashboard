@@ -12,10 +12,10 @@ function SidebarItem({ icon, label }: SidebarItemProps) {
   return (
     <Button
       variant="sidebarButton"
-      justifyContent={[null, null, 'center', 'start']}
+      justifyContent={['center', 'center', 'center', 'start']}
     >
       <Icon as={icon} fontSize="20" />
-      <Text fontWeight="medium" display={[null, null, 'none', 'block']}>
+      <Text fontWeight="medium" display={['none', 'none', 'none', 'block']}>
         {label}
       </Text>
     </Button>
@@ -26,7 +26,7 @@ function Sidebar() {
   return (
     <VStack
       p="4"
-      width={['24', '80']}
+      width={['24', '24', '24', '80']}
       borderRight="2px"
       borderColor="gray.200"
       align="start"
