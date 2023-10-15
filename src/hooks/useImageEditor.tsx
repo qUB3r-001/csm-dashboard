@@ -82,6 +82,15 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
 
   const deleteImageUpload = useCallback(() => {
     setUploadImageUrl(null);
+    setMaskedImageUrl(null);
+    setMarkedDots([]);
+    setMousePos({ x: 0, y: 0 });
+    setPanOffset({ x: 150, y: 50 });
+    setViewPortTL({ x: 150, y: 50 });
+    setMousePos({ x: 0, y: 0 });
+    setIsMousePressed(false);
+    setOpacityValue(99);
+    setScale(1);
   }, []);
 
   // mouse based events
@@ -105,12 +114,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
             0;
 
         const isInsideImageY =
-          e.clientY -
-            canvasRef.current!.getBoundingClientRect().top -
+          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
             panOffset.y <
             (300 * imageRef.current!.height) / imageRef.current!.width &&
-          e.clientY -
-            canvasRef.current!.getBoundingClientRect().top -
+          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
             panOffset.y >
             0;
 
