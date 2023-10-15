@@ -12,6 +12,7 @@ import {
   useState,
   useMemo,
   useCallback,
+  ChangeEvent,
 } from 'react';
 
 interface ImageEditorContextProps {
@@ -28,7 +29,10 @@ interface ImageEditorContextProps {
   viewPortTL: Point;
   scale: number;
   isObjectLayer: boolean;
+  uploadImageUrl: string | null;
   maskedImageUrl: string | null;
+  handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
+  deleteImageUpload: () => void;
   handleMouseDown: (e: MouseEvent) => void;
   handleMouseMove: (e: MouseEvent) => void;
   handleMouseUp: () => void;
@@ -51,6 +55,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
   const [maskedImageUrl, setMaskedImageUrl] = useState<string | null>(null);
 
   const [scale, setScale] = useState<number>(1);
@@ -70,6 +75,14 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
 
   const [opacityValue, setOpacityValue] = useState<number>(99);
   const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
+
+  const handleImageUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setUploadImageUrl(e.target.value);
+  }, []);
+
+  const deleteImageUpload = useCallback(() => {
+    setUploadImageUrl(null);
+  }, []);
 
   // mouse based events
   const handleMouseDown = useCallback(
@@ -283,7 +296,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       isObjectLayer,
       scale,
       viewPortTL,
+      uploadImageUrl,
       maskedImageUrl,
+      handleImageUpload,
+      deleteImageUpload,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
@@ -311,7 +327,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       isObjectLayer,
       scale,
       viewPortTL,
+      uploadImageUrl,
       maskedImageUrl,
+      handleImageUpload,
+      deleteImageUpload,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,

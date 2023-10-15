@@ -8,6 +8,7 @@ import LayerSelector from './LayerSelector';
 import OpacitySlider from './OpacitySlider';
 import SessionHeader from './SessionHeader';
 import ActionButtonList from './ActionButtonsList';
+import UploadImage from './UploadImage';
 
 function Dashboard() {
   const {
@@ -20,6 +21,7 @@ function Dashboard() {
     markedDots,
     panOffset,
     scale,
+    uploadImageUrl,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
@@ -42,35 +44,37 @@ function Dashboard() {
         ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
         ctx.scale(scale, scale);
 
-        const loadImage = new Image();
-        loadImage.src = 'https://i.imgur.com/VQWyTaJ.jpeg';
+        if (uploadImageUrl) {
+          const loadImage = new Image();
+          loadImage.src = uploadImageUrl;
 
-        loadImage.onload = () => {
-          const newImageWidth = 300;
-          const newImageHeight = (300 * loadImage.height) / loadImage.width;
-          console.log('image redrawn');
-          ctx.drawImage(
-            loadImage,
-            panOffset.x,
-            panOffset.y,
-            newImageWidth,
-            newImageHeight,
-          );
-          imageRef.current = loadImage;
-
-          markedDots.map((dot) => {
-            ctx.fillStyle = dot.loc === 'OBJECT' ? '#42CF00' : '#DC3545';
-            ctx.beginPath();
-            ctx.arc(
-              dot.x + panOffset.x,
-              dot.y + panOffset.y,
-              10,
-              0,
-              Math.PI * 2,
+          loadImage.onload = () => {
+            const newImageWidth = 300;
+            const newImageHeight = (300 * loadImage.height) / loadImage.width;
+            console.log('image redrawn');
+            ctx.drawImage(
+              loadImage,
+              panOffset.x,
+              panOffset.y,
+              newImageWidth,
+              newImageHeight,
             );
-            ctx.fill();
-          });
-        };
+            imageRef.current = loadImage;
+
+            markedDots.map((dot) => {
+              ctx.fillStyle = dot.loc === 'OBJECT' ? '#42CF00' : '#DC3545';
+              ctx.beginPath();
+              ctx.arc(
+                dot.x + panOffset.x,
+                dot.y + panOffset.y,
+                10,
+                0,
+                Math.PI * 2,
+              );
+              ctx.fill();
+            });
+          };
+        }
 
         if (isMaskGenerated && maskedImageUrl) {
           const maskedImage = new Image();
@@ -90,7 +94,6 @@ function Dashboard() {
               newMaskedImageHeight,
             );
             ctx.globalAlpha = 1;
-            imageRef.current = loadImage;
           };
         }
 
@@ -108,6 +111,7 @@ function Dashboard() {
     containerRef,
     canvasRef,
     imageRef,
+    uploadImageUrl,
     maskedImageUrl,
     handleMouseScroll,
   ]);
@@ -123,12 +127,16 @@ function Dashboard() {
 
         <LayerSelector />
 
-        <canvas
-          ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-        />
+        {uploadImageUrl ? (
+          <canvas
+            ref={canvasRef}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          />
+        ) : (
+          <UploadImage />
+        )}
       </Flex>
 
       <Footer />

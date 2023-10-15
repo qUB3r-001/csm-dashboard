@@ -5,7 +5,7 @@ import { IconType } from 'react-icons';
 import { BiSolidEraser } from 'react-icons/bi';
 import { CgPathCrop } from 'react-icons/cg';
 import { GrRotateLeft } from 'react-icons/gr';
-import { MdOutlinePanTool } from 'react-icons/md';
+import { MdOutlineDeleteOutline, MdOutlinePanTool } from 'react-icons/md';
 import { PiBroomDuotone } from 'react-icons/pi';
 import { TbChartGridDots } from 'react-icons/tb';
 
@@ -34,6 +34,7 @@ function ActionButton({
 function ActionButtonList() {
   const {
     isMaskGenerated,
+    deleteImageUpload,
     togglePan,
     toggleMarking,
     undoMarkedDots,
@@ -76,6 +77,10 @@ function ActionButtonList() {
         icon={MdOutlinePanTool}
         handleClick={togglePan}
         isDisabled={isMaskGenerated}
+      />
+      <ActionButton
+        icon={MdOutlineDeleteOutline}
+        handleClick={deleteImageUpload}
       />
     </SimpleGrid>
   );
