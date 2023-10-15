@@ -9,7 +9,8 @@ import {
 import { useImageEditor } from '@hooks/useImageEditor';
 
 function OpacitySlider() {
-  const { changeOpacityValue, opacityValue } = useImageEditor();
+  const { isMaskGenerated, changeOpacityValue, opacityValue } =
+    useImageEditor();
 
   return (
     <Box
@@ -22,6 +23,8 @@ function OpacitySlider() {
       right="6"
       bottom="6"
       p="4"
+      opacity={isMaskGenerated ? '1' : '0.2'}
+      pointerEvents={isMaskGenerated ? 'inherit' : 'none'}
     >
       <Text
         textAlign="center"

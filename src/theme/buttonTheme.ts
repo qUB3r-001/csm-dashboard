@@ -20,6 +20,9 @@ const actionButton = defineStyle({
   _hover: {
     bg: 'blackAlpha.100',
   },
+  _disabled: {
+    bg: 'blackAlpha.700',
+  },
 });
 
 const buttonTheme = defineStyleConfig({

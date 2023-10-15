@@ -29,7 +29,7 @@ function SidebarItem({ icon, label }: SidebarItemProps) {
 
 function SidebarLinkItem({ icon, label, href }: SidebarLinkItemProps) {
   return (
-    <Link href={href} isExternal>
+    <Link href={href} isExternal width="full">
       <Button
         variant="sidebarButton"
         justifyContent={['center', 'center', 'center', 'start']}

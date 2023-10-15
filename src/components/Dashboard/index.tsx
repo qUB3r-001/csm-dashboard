@@ -1,13 +1,13 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
-import { Flex } from '@chakra-ui/react';
 import { useEffect } from 'react';
+import { Flex } from '@chakra-ui/react';
 import { useImageEditor } from '@hooks/useImageEditor';
 import Footer from '@components/Footer';
 import LayerSelector from './LayerSelector';
 import OpacitySlider from './OpacitySlider';
 import SessionHeader from './SessionHeader';
-import ActionButtonList from './ActionButton';
+import ActionButtonList from './ActionButtonsList';
 
 function Dashboard() {
   const {
@@ -18,9 +18,11 @@ function Dashboard() {
     isMaskGenerated,
     markedDots,
     panOffset,
+    zoom,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleMouseScroll,
   } = useImageEditor();
 
   // load the image from url
@@ -30,9 +32,14 @@ function Dashboard() {
       const canvasElem = canvasRef.current;
 
       if (canvasElem) {
+        canvasElem.addEventListener('wheel', handleMouseScroll, {
+          passive: false,
+        });
         const ctx = canvasElem.getContext('2d')!;
         canvasElem.height = containerRef.current.clientHeight;
         canvasElem.width = containerRef.current.clientWidth;
+        ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+        ctx.scale(zoom, zoom);
 
         const loadImage = new Image();
         loadImage.src = 'https://i.imgur.com/VQWyTaJ.jpeg';
@@ -85,9 +92,14 @@ function Dashboard() {
             imageRef.current = loadImage;
           };
         }
+
+        return () => {
+          canvasElem.removeEventListener('wheel', handleMouseScroll);
+        };
       }
     }
   }, [
+    zoom,
     panOffset,
     markedDots,
     isMaskGenerated,
@@ -95,6 +107,7 @@ function Dashboard() {
     containerRef,
     canvasRef,
     imageRef,
+    handleMouseScroll,
   ]);
 
   return (

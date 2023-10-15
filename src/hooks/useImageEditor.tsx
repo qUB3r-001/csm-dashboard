@@ -24,10 +24,12 @@ interface ImageEditorContextProps {
   isEraserEnabled: boolean;
   markedDots: MarkedDots[];
   panOffset: Point;
+  zoom: number;
   isObjectLayer: boolean;
   handleMouseDown: (e: MouseEvent) => void;
   handleMouseMove: (e: MouseEvent) => void;
   handleMouseUp: () => void;
+  handleMouseScroll: (e: WheelEvent) => void;
   togglePan: () => void;
   toggleMarking: () => void;
   undoMarkedDots: () => void;
@@ -47,6 +49,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
+  const [zoom, setZoom] = useState<number>(1);
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [lastMousePos, setLastMousePos] = useState<Point>({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState<Point>({ x: 150, y: 50 });
@@ -165,6 +168,19 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     setIsMousePressed(false);
   }, []);
 
+  const handleMouseScroll = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault();
+
+      if (isPanningEnabled) {
+        console.log(e.deltaY);
+        const newZoom = zoom - e.deltaY / 1000;
+        setZoom(newZoom);
+      }
+    },
+    [isPanningEnabled, zoom],
+  );
+
   // action button based toggle events
   const togglePan = useCallback(() => {
     setIsPanningEnabled((prev) => !prev);
@@ -181,6 +197,13 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const toggleEraser = useCallback(() => {
     setIsPanningEnabled(false);
     setIsEraserEnabled((prev) => !prev);
+    setIsMarkingEnabled(false);
+  }, []);
+
+  const toggleMaskGenerated = useCallback(() => {
+    setIsMaskGenerated((prev) => !prev);
+    setIsPanningEnabled(false);
+    setIsEraserEnabled(false);
     setIsMarkingEnabled(false);
   }, []);
 
@@ -207,10 +230,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     [isMaskGenerated],
   );
 
-  const toggleMaskGenerated = useCallback(() => {
-    setIsMaskGenerated((prev) => !prev);
-  }, []);
-
   const imageEditorProviderValue = useMemo(
     () => ({
       containerRef,
@@ -224,9 +243,11 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       markedDots,
       panOffset,
       isObjectLayer,
+      zoom,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
+      handleMouseScroll,
       togglePan,
       toggleMarking,
       undoMarkedDots,
@@ -248,9 +269,11 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       markedDots,
       panOffset,
       isObjectLayer,
+      zoom,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
+      handleMouseScroll,
       togglePan,
       toggleMarking,
       undoMarkedDots,

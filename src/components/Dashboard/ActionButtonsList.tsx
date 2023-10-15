@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import { Button, Icon, SimpleGrid } from '@chakra-ui/react';
 import { useImageEditor } from '@hooks/useImageEditor';
 import { IconType } from 'react-icons';
@@ -11,11 +12,20 @@ import { TbChartGridDots } from 'react-icons/tb';
 interface ActionButtonProps {
   icon: IconType;
   handleClick: () => void;
+  isDisabled?: boolean;
 }
 
-function ActionButton({ icon, handleClick }: ActionButtonProps) {
+function ActionButton({
+  icon,
+  handleClick,
+  isDisabled = false,
+}: ActionButtonProps) {
   return (
-    <Button variant="actionButton" onClick={handleClick}>
+    <Button
+      variant="actionButton"
+      onClick={handleClick}
+      isDisabled={isDisabled}
+    >
       <Icon as={icon} fontSize="20" />
     </Button>
   );
@@ -23,6 +33,7 @@ function ActionButton({ icon, handleClick }: ActionButtonProps) {
 
 function ActionButtonList() {
   const {
+    isMaskGenerated,
     togglePan,
     toggleMarking,
     undoMarkedDots,
@@ -40,12 +51,32 @@ function ActionButtonList() {
       top="6"
       left="6"
     >
-      <ActionButton icon={TbChartGridDots} handleClick={toggleMarking} />
-      <ActionButton icon={GrRotateLeft} handleClick={undoMarkedDots} />
-      <ActionButton icon={BiSolidEraser} handleClick={toggleEraser} />
-      <ActionButton icon={PiBroomDuotone} handleClick={clearAllDots} />
+      <ActionButton
+        icon={TbChartGridDots}
+        handleClick={toggleMarking}
+        isDisabled={isMaskGenerated}
+      />
+      <ActionButton
+        icon={GrRotateLeft}
+        handleClick={undoMarkedDots}
+        isDisabled={isMaskGenerated}
+      />
+      <ActionButton
+        icon={BiSolidEraser}
+        handleClick={toggleEraser}
+        isDisabled={isMaskGenerated}
+      />
+      <ActionButton
+        icon={PiBroomDuotone}
+        handleClick={clearAllDots}
+        isDisabled={isMaskGenerated}
+      />
       <ActionButton icon={CgPathCrop} handleClick={toggleMaskGenerated} />
-      <ActionButton icon={MdOutlinePanTool} handleClick={togglePan} />
+      <ActionButton
+        icon={MdOutlinePanTool}
+        handleClick={togglePan}
+        isDisabled={isMaskGenerated}
+      />
     </SimpleGrid>
   );
 }
