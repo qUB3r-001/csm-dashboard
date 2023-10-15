@@ -59,7 +59,7 @@ function Sidebar() {
       <SidebarLinkItem
         icon={PiCubeFocus}
         label="Submit Feedback"
-        href="https://forms.gle/s92zrEyfL7WcibxCA"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSf1Kw7wDDunRf_8CHbMRMd22jARr3Y9uaMvQCOl64U95lzbuQ/viewform?usp=sf_link"
       />
     </VStack>
   );
