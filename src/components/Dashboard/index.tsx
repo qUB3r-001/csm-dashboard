@@ -18,7 +18,7 @@ function Dashboard() {
     isMaskGenerated,
     markedDots,
     panOffset,
-    zoom,
+    scale,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
@@ -39,7 +39,7 @@ function Dashboard() {
         canvasElem.height = containerRef.current.clientHeight;
         canvasElem.width = containerRef.current.clientWidth;
         ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-        ctx.scale(zoom, zoom);
+        ctx.scale(scale, scale);
 
         const loadImage = new Image();
         loadImage.src = 'https://i.imgur.com/VQWyTaJ.jpeg';
@@ -99,7 +99,7 @@ function Dashboard() {
       }
     }
   }, [
-    zoom,
+    scale,
     panOffset,
     markedDots,
     isMaskGenerated,
