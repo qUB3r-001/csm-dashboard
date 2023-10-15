@@ -77,14 +77,14 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       setMousePos({ x: e.clientX, y: e.clientY });
 
       if (isMarkingEnabled) {
-        console.log('point marked');
+        console.log('point marked', scale);
         const isInsideImageX =
-          e.clientX -
-            canvasRef.current!.getBoundingClientRect().left -
+          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
+            scale -
             panOffset.x <
             300 &&
-          e.clientX -
-            canvasRef.current!.getBoundingClientRect().left -
+          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
+            scale -
             panOffset.x >
             0;
 
@@ -217,7 +217,9 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     setIsPanningEnabled(false);
     setIsEraserEnabled(false);
     setIsMarkingEnabled(false);
-  }, []);
+
+    console.log(markedDots);
+  }, [markedDots]);
 
   const undoMarkedDots = useCallback(() => {
     setMarkedDots((prev) => prev.slice(0, -1));
