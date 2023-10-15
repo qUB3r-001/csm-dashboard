@@ -1,4 +1,5 @@
 import Dashboard from '@components/Dashboard';
+import ImageEditorProvider from '@hooks/useImageEditor';
 import DashboardLayout from '@layouts/DashboardLayout';
 import Head from 'next/head';
 
@@ -17,7 +18,9 @@ export default function DashboardPage() {
 
       <main>
         <DashboardLayout>
-          <Dashboard />
+          <ImageEditorProvider>
+            <Dashboard />
+          </ImageEditorProvider>
         </DashboardLayout>
       </main>
     </>

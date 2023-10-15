@@ -20,7 +20,9 @@
       "@components/*": ["components/*"],
       "@layouts/*": ["layouts/*"],
       "@assets/*": ["assets/*"],
-      "@typings/*": ["typings/*"]
+      "@typings/*": ["typings/*"],
+      "@utils/*": ["utils/*"],
+      "@hooks/*": ["hooks/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

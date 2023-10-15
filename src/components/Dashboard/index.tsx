@@ -1,156 +1,42 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
 import { Flex, SimpleGrid } from '@chakra-ui/react';
-import { MarkedDots, Point } from '@typings/index';
-import { useEffect, useRef, useState, MouseEvent } from 'react';
+import { useEffect } from 'react';
 import { BiSolidEraser } from 'react-icons/bi';
 import { CgPathCrop } from 'react-icons/cg';
 import { GrRotateLeft } from 'react-icons/gr';
 import { MdOutlinePanTool } from 'react-icons/md';
 import { PiBroomDuotone } from 'react-icons/pi';
 import { TbChartGridDots } from 'react-icons/tb';
-import { findInteriorOfPointInArray } from 'utils/2dSpaceUtils';
+import { useImageEditor } from '@hooks/useImageEditor';
+import Footer from '@components/Footer';
 import ActionButton from './ActionButton';
 import LayerSelector from './LayerSelector';
 import OpacitySlider from './OpacitySlider';
-
 import SessionHeader from './SessionHeader';
 
 function Dashboard() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
-  const [lastMousePos, setLastMousePos] = useState<Point>({ x: 0, y: 0 });
-  const [panOffset, setPanOffset] = useState<Point>({ x: 150, y: 50 });
-
-  const [isPanningEnabled, setIsPanningEnabled] = useState<boolean>(false);
-  const [isMarkingEnabled, setIsMarkingEnabled] = useState<boolean>(false);
-  const [isEraserEnabled, setIsEraserEnabled] = useState<boolean>(false);
-  const [isObjectLayer, setIsObjectLayer] = useState<boolean>(true);
-  const [isMaskGenerated, setIsMaskGenerated] = useState<boolean>(false);
-  const [opacityValue, setOpacityValue] = useState<number>(99);
-
-  const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
-
-  const handleMouseDown = (e: MouseEvent) => {
-    console.log('click down');
-
-    setIsMousePressed(true);
-    setLastMousePos({ x: e.clientX, y: e.clientY });
-
-    if (isMarkingEnabled) {
-      console.log('point marked');
-      const isInsideImageX =
-        e.clientX -
-          canvasRef.current!.getBoundingClientRect().left -
-          panOffset.x <
-          300 &&
-        e.clientX -
-          canvasRef.current!.getBoundingClientRect().left -
-          panOffset.x >
-          0;
-
-      const isInsideImageY =
-        e.clientY -
-          canvasRef.current!.getBoundingClientRect().top -
-          panOffset.y <
-          (300 * imageRef.current!.height) / imageRef.current!.width &&
-        e.clientY -
-          canvasRef.current!.getBoundingClientRect().top -
-          panOffset.y >
-          0;
-
-      if (isInsideImageX && isInsideImageY) {
-        setMarkedDots((prev) => [
-          ...prev,
-          {
-            x:
-              e.clientX -
-              canvasRef.current!.getBoundingClientRect().left -
-              panOffset.x,
-            y:
-              e.clientY -
-              canvasRef.current!.getBoundingClientRect().top -
-              panOffset.y,
-            loc: isObjectLayer ? 'OBJECT' : 'BACKGROUND',
-          },
-        ]);
-      } else {
-        console.log('clicked outside image');
-      }
-    }
-
-    if (isEraserEnabled) {
-      console.log('erase point');
-      setMarkedDots(
-        findInteriorOfPointInArray(markedDots, {
-          x:
-            e.clientX -
-            canvasRef.current!.getBoundingClientRect().left -
-            panOffset.x,
-          y:
-            e.clientY -
-            canvasRef.current!.getBoundingClientRect().top -
-            panOffset.y,
-        }),
-      );
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isMousePressed && isPanningEnabled) {
-      console.log('pan');
-      const dx = e.clientX - lastMousePos.x;
-      const dy = e.clientY - lastMousePos.y;
-      const newPanOffset: Point = {
-        x: panOffset.x + dx,
-        y: panOffset.y + dy,
-      };
-
-      setPanOffset(newPanOffset);
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsMousePressed(false);
-  };
-
-  const togglePan = () => {
-    setIsPanningEnabled((prev) => !prev);
-  };
-
-  const toggleMarking = () => {
-    setIsMarkingEnabled((prev) => !prev);
-  };
-
-  const undoMarkedDots = () => {
-    setMarkedDots((prev) => prev.slice(0, -1));
-  };
-
-  const toggleLayer = () => {
-    setIsObjectLayer((prev) => !prev);
-  };
-
-  const toggleEraser = () => {
-    setIsEraserEnabled((prev) => !prev);
-  };
-
-  const clearAllDots = () => {
-    setMarkedDots([]);
-  };
-
-  const toggleMaskGenerated = () => {
-    setIsMaskGenerated((prev) => !prev);
-  };
-
-  const changeOpacityValue = (currValue: number) => {
-    if (isMaskGenerated) {
-      setOpacityValue(currValue);
-    }
-  };
+  const {
+    containerRef,
+    canvasRef,
+    imageRef,
+    opacityValue,
+    isMaskGenerated,
+    markedDots,
+    panOffset,
+    isObjectLayer,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    togglePan,
+    toggleMarking,
+    undoMarkedDots,
+    toggleLayer,
+    toggleEraser,
+    clearAllDots,
+    toggleMaskGenerated,
+    changeOpacityValue,
+  } = useImageEditor();
 
   // load the image from url
   // render in the center of the canvas
@@ -216,7 +102,15 @@ function Dashboard() {
         }
       }
     }
-  }, [panOffset, markedDots, isMaskGenerated, opacityValue]);
+  }, [
+    panOffset,
+    markedDots,
+    isMaskGenerated,
+    opacityValue,
+    containerRef,
+    canvasRef,
+    imageRef,
+  ]);
 
   return (
     <Flex flex="1" p="4" direction="column" gap="6">
@@ -255,6 +149,8 @@ function Dashboard() {
           onMouseMove={handleMouseMove}
         />
       </Flex>
+
+      <Footer />
     </Flex>
   );
 }

@@ -1,5 +1,4 @@
 import { Box, Flex } from '@chakra-ui/react';
-import Footer from '@components/Footer';
 import Sidebar from '@components/Sidebar';
 import Topbar from '@components/Topbar';
 import { ReactNode } from 'react';
@@ -30,7 +29,6 @@ function DashboardLayout({ children }: { children: ReactNode }) {
         <Sidebar />
         <Flex direction="column" flex="1">
           <Flex flex="1">{children}</Flex>
-          <Footer />
         </Flex>
       </Flex>
     </Flex>
