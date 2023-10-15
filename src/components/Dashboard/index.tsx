@@ -14,6 +14,7 @@ function Dashboard() {
     containerRef,
     canvasRef,
     imageRef,
+    maskedImageUrl,
     opacityValue,
     isMaskGenerated,
     markedDots,
@@ -71,9 +72,9 @@ function Dashboard() {
           });
         };
 
-        if (isMaskGenerated) {
+        if (isMaskGenerated && maskedImageUrl) {
           const maskedImage = new Image();
-          maskedImage.src = 'https://i.imgur.com/XKAdtN1.jpeg';
+          maskedImage.src = maskedImageUrl;
 
           maskedImage.onload = () => {
             const newMaskedImageWidth = 300;
@@ -107,6 +108,7 @@ function Dashboard() {
     containerRef,
     canvasRef,
     imageRef,
+    maskedImageUrl,
     handleMouseScroll,
   ]);
 

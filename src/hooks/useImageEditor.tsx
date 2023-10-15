@@ -1,5 +1,6 @@
 import { MarkedDots, Point } from '@typings/index';
 import { addPoints, findInteriorOfPointInArray } from '@utils/2dSpaceUtils';
+import axios from 'axios';
 import {
   createContext,
   MouseEvent,
@@ -27,6 +28,7 @@ interface ImageEditorContextProps {
   viewPortTL: Point;
   scale: number;
   isObjectLayer: boolean;
+  maskedImageUrl: string | null;
   handleMouseDown: (e: MouseEvent) => void;
   handleMouseMove: (e: MouseEvent) => void;
   handleMouseUp: () => void;
@@ -49,6 +51,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const [maskedImageUrl, setMaskedImageUrl] = useState<string | null>(null);
 
   const [scale, setScale] = useState<number>(1);
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
@@ -212,14 +215,35 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     setIsMarkingEnabled(false);
   }, []);
 
-  const toggleMaskGenerated = useCallback(() => {
+  const toggleMaskGenerated = useCallback(async () => {
     setIsMaskGenerated((prev) => !prev);
     setIsPanningEnabled(false);
     setIsEraserEnabled(false);
     setIsMarkingEnabled(false);
 
-    console.log(markedDots);
-  }, [markedDots]);
+    if (!isMaskGenerated) {
+      const sendDataForSegmentationMask = async () => {
+        const response = await axios.post('/api/compute-mask', {
+          data: JSON.stringify({
+            markedDots,
+            imageData: {
+              height: imageRef.current!.height,
+              width: imageRef.current!.width,
+              imageCanvasWidth: 300,
+              imageCanvasHeight:
+                (300 * imageRef.current!.height) / imageRef.current!.width,
+              currentCanvasScale: scale,
+            },
+          }),
+        });
+
+        setMaskedImageUrl(response.data.maskedUrl);
+        return response;
+      };
+
+      sendDataForSegmentationMask();
+    }
+  }, [isMaskGenerated, markedDots, scale]);
 
   const undoMarkedDots = useCallback(() => {
     setMarkedDots((prev) => prev.slice(0, -1));
@@ -259,6 +283,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       isObjectLayer,
       scale,
       viewPortTL,
+      maskedImageUrl,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
@@ -286,6 +311,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       isObjectLayer,
       scale,
       viewPortTL,
+      maskedImageUrl,
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
