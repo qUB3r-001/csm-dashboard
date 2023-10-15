@@ -6,13 +6,11 @@ import {
   SliderTrack,
   Text,
 } from '@chakra-ui/react';
+import { useImageEditor } from '@hooks/useImageEditor';
 
-interface OpacitySliderProps {
-  opacityValue: number;
-  handleChange: (val: number) => void;
-}
+function OpacitySlider() {
+  const { changeOpacityValue, opacityValue } = useImageEditor();
 
-function OpacitySlider({ opacityValue, handleChange }: OpacitySliderProps) {
   return (
     <Box
       width="44"
@@ -38,7 +36,7 @@ function OpacitySlider({ opacityValue, handleChange }: OpacitySliderProps) {
         aria-label="slider-ex-1"
         min={0}
         max={99}
-        onChange={handleChange}
+        onChange={changeOpacityValue}
         value={opacityValue}
       >
         <SliderTrack>

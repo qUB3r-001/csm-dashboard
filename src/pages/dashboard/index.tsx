@@ -1,5 +1,5 @@
 import Dashboard from '@components/Dashboard';
-import ImageEditorProvider from '@hooks/useImageEditor';
+import { ImageEditorProvider } from '@hooks/useImageEditor';
 import DashboardLayout from '@layouts/DashboardLayout';
 import Head from 'next/head';
 

@@ -14,8 +14,8 @@ import {
 } from 'react';
 
 interface ImageEditorContextProps {
-  containerRef: RefObject<HTMLDivElement | null>;
-  canvasRef: RefObject<HTMLCanvasElement | null>;
+  containerRef: RefObject<HTMLDivElement>;
+  canvasRef: RefObject<HTMLCanvasElement>;
   imageRef: MutableRefObject<HTMLImageElement | null>;
   opacityValue: number;
   isMaskGenerated: boolean;
@@ -31,7 +31,7 @@ interface ImageEditorContextProps {
   togglePan: () => void;
   toggleMarking: () => void;
   undoMarkedDots: () => void;
-  toggleLayer: () => void;
+  toggleObjectLayer: () => void;
   toggleEraser: () => void;
   clearAllDots: () => void;
   toggleMaskGenerated: () => void;
@@ -43,8 +43,8 @@ const ImageEditorContext = createContext<ImageEditorContextProps>(
 );
 
 export function ImageEditorProvider({ children }: { children: ReactNode }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
@@ -60,6 +60,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const [opacityValue, setOpacityValue] = useState<number>(99);
   const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
 
+  // mouse based events
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
       console.log('click down');
@@ -164,34 +165,39 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     setIsMousePressed(false);
   }, []);
 
+  // action button based toggle events
   const togglePan = useCallback(() => {
     setIsPanningEnabled((prev) => !prev);
+    setIsEraserEnabled(false);
+    setIsMarkingEnabled(false);
   }, []);
 
   const toggleMarking = useCallback(() => {
+    setIsPanningEnabled(false);
+    setIsEraserEnabled(false);
     setIsMarkingEnabled((prev) => !prev);
+  }, []);
+
+  const toggleEraser = useCallback(() => {
+    setIsPanningEnabled(false);
+    setIsEraserEnabled((prev) => !prev);
+    setIsMarkingEnabled(false);
   }, []);
 
   const undoMarkedDots = useCallback(() => {
     setMarkedDots((prev) => prev.slice(0, -1));
   }, []);
 
-  const toggleLayer = useCallback(() => {
-    setIsObjectLayer((prev) => !prev);
-  }, []);
-
-  const toggleEraser = useCallback(() => {
-    setIsEraserEnabled((prev) => !prev);
-  }, []);
-
   const clearAllDots = useCallback(() => {
     setMarkedDots([]);
   }, []);
 
-  const toggleMaskGenerated = useCallback(() => {
-    setIsMaskGenerated((prev) => !prev);
+  // switch to toggle layer for marking dots
+  const toggleObjectLayer = useCallback(() => {
+    setIsObjectLayer((prev) => !prev);
   }, []);
 
+  // mask opacity slider
   const changeOpacityValue = useCallback(
     (currValue: number) => {
       if (isMaskGenerated) {
@@ -200,6 +206,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     },
     [isMaskGenerated],
   );
+
+  const toggleMaskGenerated = useCallback(() => {
+    setIsMaskGenerated((prev) => !prev);
+  }, []);
 
   const imageEditorProviderValue = useMemo(
     () => ({
@@ -220,7 +230,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       togglePan,
       toggleMarking,
       undoMarkedDots,
-      toggleLayer,
+      toggleObjectLayer,
       toggleEraser,
       clearAllDots,
       toggleMaskGenerated,
@@ -244,7 +254,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       togglePan,
       toggleMarking,
       undoMarkedDots,
-      toggleLayer,
+      toggleObjectLayer,
       toggleEraser,
       clearAllDots,
       toggleMaskGenerated,
