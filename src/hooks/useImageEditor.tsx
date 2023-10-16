@@ -1,5 +1,5 @@
 import { MarkedDots, Point } from '@typings/index';
-import { addPoints, findInteriorOfPointInArray } from '@utils/2dSpaceUtils';
+import { findInteriorOfPointInArray } from '@utils/2dSpaceUtils';
 import axios from 'axios';
 import {
   createContext,
@@ -26,7 +26,6 @@ interface ImageEditorContextProps {
   isEraserEnabled: boolean;
   markedDots: MarkedDots[];
   panOffset: Point;
-  viewPortTL: Point;
   scale: number;
   isObjectLayer: boolean;
   uploadImageUrl: string | null;
@@ -61,10 +60,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const [scale, setScale] = useState<number>(1);
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
-  const [viewPortTL, setViewPortTL] = useState<Point>({
-    x: 0,
-    y: 0,
-  });
+
   const [panOffset, setPanOffset] = useState<Point>({ x: 150, y: 50 });
   const [isObjectLayer, setIsObjectLayer] = useState<boolean>(true);
 
@@ -86,7 +82,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     setMarkedDots([]);
     setMousePos({ x: 0, y: 0 });
     setPanOffset({ x: 150, y: 50 });
-    setViewPortTL({ x: 150, y: 50 });
     setMousePos({ x: 0, y: 0 });
     setIsMousePressed(false);
     setOpacityValue(99);
@@ -102,7 +97,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       setMousePos({ x: e.clientX, y: e.clientY });
 
       if (isMarkingEnabled) {
-        console.log('point marked', scale);
+        console.log('point marked');
         const isInsideImageX =
           (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
             scale -
@@ -202,18 +197,13 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       e.preventDefault();
 
       if (isPanningEnabled) {
+        console.log('mouse scroll');
         const zoom = 1 - e.deltaY / 1000;
-        const viewPortTLDelta: Point = {
-          x: (mousePos.x / scale) * (1 - 1 / zoom),
-          y: (mousePos.y / scale) * (1 - 1 / zoom),
-        };
-        const newViewPortTL = addPoints(viewPortTL, viewPortTLDelta);
 
         setScale(scale * zoom);
-        setViewPortTL(newViewPortTL);
       }
     },
-    [isPanningEnabled, mousePos.x, mousePos.y, scale, viewPortTL],
+    [isPanningEnabled, scale],
   );
 
   // action button based toggle events
@@ -302,7 +292,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       panOffset,
       isObjectLayer,
       scale,
-      viewPortTL,
       uploadImageUrl,
       maskedImageUrl,
       handleImageUpload,
@@ -333,7 +322,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       panOffset,
       isObjectLayer,
       scale,
-      viewPortTL,
       uploadImageUrl,
       maskedImageUrl,
       handleImageUpload,

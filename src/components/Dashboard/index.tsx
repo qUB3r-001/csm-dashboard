@@ -32,16 +32,17 @@ function Dashboard() {
   // render in the center of the canvas
   useEffect(() => {
     if (containerRef.current) {
+      const containerElem = containerRef.current;
       const canvasElem = canvasRef.current;
+      containerElem.addEventListener('wheel', handleMouseScroll, {
+        passive: false,
+      });
 
       if (canvasElem) {
-        canvasElem.addEventListener('wheel', handleMouseScroll, {
-          passive: false,
-        });
         const ctx = canvasElem.getContext('2d')!;
         canvasElem.height = containerRef.current.clientHeight;
         canvasElem.width = containerRef.current.clientWidth;
-        ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+        // ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
         ctx.scale(scale, scale);
 
         if (uploadImageUrl) {
@@ -96,11 +97,11 @@ function Dashboard() {
             ctx.globalAlpha = 1;
           };
         }
-
-        return () => {
-          canvasElem.removeEventListener('wheel', handleMouseScroll);
-        };
       }
+
+      return () => {
+        containerElem.removeEventListener('wheel', handleMouseScroll);
+      };
     }
   }, [
     scale,
