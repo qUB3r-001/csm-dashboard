@@ -12,7 +12,8 @@ function Footer() {
   return (
     <Flex
       borderTop="2px"
-      height="28"
+      height={['12', '12', '12', '24']}
+      fontSize={['3xs', 'inherit']}
       borderColor="gray.200"
       justify="center"
       align="center"

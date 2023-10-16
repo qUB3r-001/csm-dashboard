@@ -12,7 +12,6 @@ import {
   useState,
   useMemo,
   useCallback,
-  ChangeEvent,
 } from 'react';
 
 interface ImageEditorContextProps {
@@ -30,7 +29,7 @@ interface ImageEditorContextProps {
   isObjectLayer: boolean;
   uploadImageUrl: string | null;
   maskedImageUrl: string | null;
-  handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleImageUpload: (url: string) => void;
   deleteImageUpload: () => void;
   handleMouseDown: (e: MouseEvent) => void;
   handleMouseMove: (e: MouseEvent) => void;
@@ -61,7 +60,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
 
-  const [panOffset, setPanOffset] = useState<Point>({ x: 150, y: 50 });
+  const [panOffset, setPanOffset] = useState<Point>({
+    x: 150,
+    y: 50,
+  });
   const [isObjectLayer, setIsObjectLayer] = useState<boolean>(true);
 
   const [isPanningEnabled, setIsPanningEnabled] = useState<boolean>(false);
@@ -72,8 +74,8 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const [opacityValue, setOpacityValue] = useState<number>(99);
   const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
 
-  const handleImageUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setUploadImageUrl(e.target.value);
+  const handleImageUpload = useCallback((url: string) => {
+    setUploadImageUrl(url);
   }, []);
 
   const deleteImageUpload = useCallback(() => {

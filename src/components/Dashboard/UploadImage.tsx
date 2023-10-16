@@ -1,8 +1,10 @@
-import { Box, Input } from '@chakra-ui/react';
+import { Box, Button, Input } from '@chakra-ui/react';
 import { useImageEditor } from '@hooks/useImageEditor';
+import { useState } from 'react';
 
 function UploadImage() {
-  const { handleImageUpload, uploadImageUrl } = useImageEditor();
+  const { handleImageUpload } = useImageEditor();
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   return (
     <Box
@@ -11,12 +13,17 @@ function UploadImage() {
       top="50%"
       left="50%"
       style={{ transform: 'translate(-50%, -50%)' }}
+      textAlign="center"
     >
       <Input
         placeholder="Paste URL of the image"
-        onChange={handleImageUpload}
-        value={uploadImageUrl || ''}
+        size={['sm']}
+        onChange={(e) => setImageUrl(e.target.value)}
+        value={imageUrl || ''}
       />
+      <Button onClick={() => handleImageUpload(imageUrl!)} size="sm" m="4">
+        Upload
+      </Button>
     </Box>
   );
 }

@@ -45,7 +45,7 @@ function ActionButtonList() {
 
   return (
     <SimpleGrid
-      columns={[null, null, 1, 2]}
+      columns={[4, 2]}
       height="max-content"
       spacing="4"
       position="absolute"

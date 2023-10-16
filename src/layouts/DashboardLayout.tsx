@@ -12,6 +12,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
       position="relative"
       direction="column"
       gap="6"
+      overflow="scroll"
     >
       <Box position="absolute" top="0" left="0" width="full" zIndex={-10}>
         <BgSvgTop />

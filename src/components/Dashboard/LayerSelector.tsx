@@ -8,8 +8,9 @@ function LayerSelector() {
   return (
     <VStack
       position="absolute"
-      right="6"
-      top="6"
+      right={['unset', '6']}
+      top={['unset', '6']}
+      bottom={['6', 'unset']}
       gap="4"
       p="4"
       width="28"
