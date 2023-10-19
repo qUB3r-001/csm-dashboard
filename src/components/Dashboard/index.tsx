@@ -56,9 +56,9 @@ function Dashboard() {
               console.log('image redrawn');
             };
           } else {
-            // ctx.translate(tlPos.x, tlPos.y);
-            // ctx.scale(scale, scale);
-            // ctx.translate(-tlPos.x, -tlPos.y);
+            ctx.translate(tlPos.x, tlPos.y);
+            ctx.scale(scale, scale);
+            ctx.translate(-tlPos.x, -tlPos.y);
 
             ctx.drawImage(
               loadImage,
@@ -72,8 +72,8 @@ function Dashboard() {
               ctx.fillStyle = dot.loc === 'OBJECT' ? '#42CF00' : '#DC3545';
               ctx.beginPath();
               ctx.arc(
-                dot.realX + panOffset.x, // render correctly instead of updating state
-                dot.realY + panOffset.y,
+                dot.x + panOffset.x, // render correctly instead of updating state
+                dot.y + panOffset.y,
                 10,
                 0,
                 Math.PI * 2,
@@ -125,6 +125,8 @@ function Dashboard() {
     maskedImageUrl,
     handleMouseScroll,
     setupInitialOffsetAndScale,
+    tlPos.x,
+    tlPos.y,
   ]);
 
   return (

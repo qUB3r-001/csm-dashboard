@@ -37,6 +37,7 @@ interface ImageEditorContextProps {
   uploadImageUrl: string | null;
   maskedImageUrl: string | null;
   tlPos: Point;
+  lastTLPosRef: MutableRefObject<Point>;
   setupInitialOffsetAndScale: (
     canvasElem: HTMLCanvasElement,
     loadImage: HTMLImageElement,
@@ -65,6 +66,8 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const lastTLPosRef = useRef<Point>({ x: 0, y: 0 });
+
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
     'https://i.imgur.com/VQWyTaJ.jpeg',
   );
@@ -145,12 +148,15 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
 
       const relativeMousePos: Point = {
         x:
-          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
-            scale -
-          panOffset.x,
+          (e.clientX -
+            canvasRef.current!.getBoundingClientRect().left -
+            panOffset.x) /
+          scale,
         y:
-          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
-          panOffset.y,
+          (e.clientY -
+            canvasRef.current!.getBoundingClientRect().top -
+            panOffset.y) /
+          scale,
       };
 
       if (isMarkingEnabled) {
@@ -168,14 +174,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
             {
               x: relativeMousePos.x,
               y: relativeMousePos.y,
-              realX:
-                (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
-                  scale -
-                panOffset.x,
-              realY:
-                (e.clientY - canvasRef.current!.getBoundingClientRect().top) /
-                  scale -
-                panOffset.y,
+
               loc: isObjectLayer ? 'OBJECT' : 'BACKGROUND',
             },
           ]);
@@ -213,8 +212,8 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (isMousePressed && isPanningEnabled) {
-        const dx = e.clientX - mousePos.x;
-        const dy = e.clientY - mousePos.y;
+        const dx = (e.clientX - mousePos.x) / scale;
+        const dy = (e.clientY - mousePos.y) / scale;
         const newPanOffset: Point = {
           x: panOffset.x + dx,
           y: panOffset.y + dy,
@@ -224,7 +223,14 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
         setMousePos({ x: e.clientX, y: e.clientY });
       }
     },
-    [isMousePressed, isPanningEnabled, mousePos.x, mousePos.y, panOffset],
+    [
+      isMousePressed,
+      isPanningEnabled,
+      mousePos.x,
+      mousePos.y,
+      panOffset,
+      scale,
+    ],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -234,16 +240,18 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const handleMouseScroll = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
+      console.log(scale, lastTLPosRef.current, tlPos);
+
+      lastTLPosRef.current = tlPos;
 
       if (isPanningEnabled) {
-        console.log('mouse scroll', tlPos);
-        const zoom = 1 - e.deltaY / 1000;
+        const zoom = 1 - e.deltaY / 1500;
 
         setScale(scale * zoom);
 
         setTlPos({
-          x: e.clientX - canvasRef.current!.getBoundingClientRect().x,
-          y: e.clientY - canvasRef.current!.getBoundingClientRect().y,
+          x: e.clientX - canvasRef.current!.getBoundingClientRect().left,
+          y: e.clientY - canvasRef.current!.getBoundingClientRect().top,
         });
       }
     },
@@ -339,6 +347,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       uploadImageUrl,
       maskedImageUrl,
       tlPos,
+      lastTLPosRef,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
@@ -371,6 +380,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       uploadImageUrl,
       maskedImageUrl,
       tlPos,
+      lastTLPosRef,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
