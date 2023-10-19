@@ -14,6 +14,13 @@ import {
   useCallback,
 } from 'react';
 
+interface SetupOffsetAndScaleResponse {
+  startingImagePosx: number;
+  startingImagePosy: number;
+  startingImageWidth: number;
+  startingImageHeight: number;
+}
+
 interface ImageEditorContextProps {
   containerRef: RefObject<HTMLDivElement>;
   canvasRef: RefObject<HTMLCanvasElement>;
@@ -29,6 +36,11 @@ interface ImageEditorContextProps {
   isObjectLayer: boolean;
   uploadImageUrl: string | null;
   maskedImageUrl: string | null;
+  tlPos: Point;
+  setupInitialOffsetAndScale: (
+    canvasElem: HTMLCanvasElement,
+    loadImage: HTMLImageElement,
+  ) => SetupOffsetAndScaleResponse;
   handleImageUpload: (url: string) => void;
   deleteImageUpload: () => void;
   handleMouseDown: (e: MouseEvent) => void;
@@ -53,16 +65,22 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(null);
+  const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
+    'https://i.imgur.com/VQWyTaJ.jpeg',
+  );
   const [maskedImageUrl, setMaskedImageUrl] = useState<string | null>(null);
 
   const [scale, setScale] = useState<number>(1);
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
 
+  const [tlPos, setTlPos] = useState<Point>({
+    x: 0,
+    y: 0,
+  });
   const [panOffset, setPanOffset] = useState<Point>({
-    x: 150,
-    y: 50,
+    x: 0,
+    y: 0,
   });
   const [isObjectLayer, setIsObjectLayer] = useState<boolean>(true);
 
@@ -73,6 +91,30 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
 
   const [opacityValue, setOpacityValue] = useState<number>(99);
   const [markedDots, setMarkedDots] = useState<MarkedDots[]>([]);
+
+  const setupInitialOffsetAndScale = useCallback(
+    (canvasElem: HTMLCanvasElement, loadImage: HTMLImageElement) => {
+      const startingImageWidth = 300;
+      const startingImageHeight = (300 * loadImage.height) / loadImage.width;
+      const startingImagePosx = canvasElem.width / 2 - startingImageWidth / 2;
+      const startingImagePosy = canvasElem.height / 2 - startingImageHeight / 2;
+
+      if (!imageRef.current) {
+        setPanOffset({
+          x: startingImagePosx,
+          y: startingImagePosy,
+        });
+      }
+
+      return {
+        startingImagePosx,
+        startingImagePosy,
+        startingImageWidth,
+        startingImageHeight,
+      };
+    },
+    [],
+  );
 
   const handleImageUpload = useCallback((url: string) => {
     setUploadImageUrl(url);
@@ -93,40 +135,44 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   // mouse based events
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
-      console.log('click down');
+      console.log('click down', panOffset);
 
       setIsMousePressed(true);
-      setMousePos({ x: e.clientX, y: e.clientY });
+      setMousePos({
+        x: e.clientX,
+        y: e.clientY,
+      });
+
+      const relativeMousePos: Point = {
+        x:
+          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
+            scale -
+          panOffset.x,
+        y:
+          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
+          panOffset.y,
+      };
 
       if (isMarkingEnabled) {
-        console.log('point marked');
         const isInsideImageX =
-          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
-            scale -
-            panOffset.x <
-            300 &&
-          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
-            scale -
-            panOffset.x >
-            0;
+          relativeMousePos.x < 300 && relativeMousePos.x > 0;
 
         const isInsideImageY =
-          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
-            panOffset.y <
+          relativeMousePos.y <
             (300 * imageRef.current!.height) / imageRef.current!.width &&
-          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
-            panOffset.y >
-            0;
+          relativeMousePos.y > 0;
 
         if (isInsideImageX && isInsideImageY) {
           setMarkedDots((prev) => [
             ...prev,
             {
-              x:
+              x: relativeMousePos.x,
+              y: relativeMousePos.y,
+              realX:
                 (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
                   scale -
                 panOffset.x,
-              y:
+              realY:
                 (e.clientY - canvasRef.current!.getBoundingClientRect().top) /
                   scale -
                 panOffset.y,
@@ -134,7 +180,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
             },
           ]);
         } else {
-          console.log('clicked outside image');
+          console.log('clicked outside image', relativeMousePos);
         }
       }
 
@@ -155,20 +201,18 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       }
     },
     [
+      panOffset,
       scale,
-      isEraserEnabled,
       isMarkingEnabled,
+      isEraserEnabled,
       isObjectLayer,
       markedDots,
-      panOffset.x,
-      panOffset.y,
     ],
   );
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (isMousePressed && isPanningEnabled) {
-        console.log('pan');
         const dx = e.clientX - mousePos.x;
         const dy = e.clientY - mousePos.y;
         const newPanOffset: Point = {
@@ -180,14 +224,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
         setMousePos({ x: e.clientX, y: e.clientY });
       }
     },
-    [
-      isMousePressed,
-      isPanningEnabled,
-      mousePos.x,
-      mousePos.y,
-      panOffset.x,
-      panOffset.y,
-    ],
+    [isMousePressed, isPanningEnabled, mousePos.x, mousePos.y, panOffset],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -199,13 +236,18 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       e.preventDefault();
 
       if (isPanningEnabled) {
-        console.log('mouse scroll');
+        console.log('mouse scroll', tlPos);
         const zoom = 1 - e.deltaY / 1000;
 
         setScale(scale * zoom);
+
+        setTlPos({
+          x: e.clientX - canvasRef.current!.getBoundingClientRect().x,
+          y: e.clientY - canvasRef.current!.getBoundingClientRect().y,
+        });
       }
     },
-    [isPanningEnabled, scale],
+    [isPanningEnabled, scale, tlPos],
   );
 
   // action button based toggle events
@@ -296,6 +338,8 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
+      tlPos,
+      setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
       handleMouseDown,
@@ -326,6 +370,8 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
+      tlPos,
+      setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
       handleMouseDown,

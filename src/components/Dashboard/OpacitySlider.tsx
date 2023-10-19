@@ -31,7 +31,7 @@ function OpacitySlider() {
         fontWeight="semibold"
         px="4"
         py="2"
-        fontSize="sm"
+        fontSize={['2xs', 'sm']}
       >
         Mask Opacity
       </Text>

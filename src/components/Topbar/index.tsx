@@ -7,7 +7,7 @@ function Topbar() {
     <Flex
       borderRadius="lg"
       p="4"
-      m="6"
+      m="4"
       alignItems="center"
       gap="6"
       borderWidth="1px"

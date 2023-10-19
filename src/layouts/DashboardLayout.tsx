@@ -6,14 +6,7 @@ import { ReactNode } from 'react';
 
 function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <Flex
-      height="100vh"
-      width="full"
-      position="relative"
-      direction="column"
-      gap="6"
-      overflow="scroll"
-    >
+    <Flex height="100vh" width="full" position="relative" direction="column">
       <Box position="absolute" top="0" left="0" width="full" zIndex={-10}>
         <BgSvgTop />
       </Box>
@@ -23,7 +16,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
       </Box>
 
       <Topbar />
-      <Flex flex="1">
+      <Flex flex="1" direction={['column-reverse', null, null, 'row']}>
         <Sidebar />
         <Flex direction="column" flex="1">
           <Flex flex="1">{children}</Flex>

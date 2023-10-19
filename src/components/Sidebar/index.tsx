@@ -1,5 +1,5 @@
 /* eslint-disable react/require-default-props */
-import { Button, Icon, Link, Spacer, Text, VStack } from '@chakra-ui/react';
+import { Button, Flex, Icon, Link, Text } from '@chakra-ui/react';
 import { IconType } from 'react-icons/lib';
 import { MdOutlineSpaceDashboard, MdPlaylistPlay } from 'react-icons/md';
 import { PiCubeFocus } from 'react-icons/pi';
@@ -45,23 +45,29 @@ function SidebarLinkItem({ icon, label, href }: SidebarLinkItemProps) {
 
 function Sidebar() {
   return (
-    <VStack
+    <Flex
       p="4"
-      width={['24', '24', '24', '80']}
+      direction={['row', null, null, 'column']}
+      justifyContent={[
+        'space-between',
+        'space-between',
+        'space-between',
+        'start',
+      ]}
+      width={['full', 'full', 'full', '80']}
       borderRight="2px"
-      borderColor="gray.200"
+      borderRightColor="gray.200"
       align="start"
       gap="4"
     >
       <SidebarItem icon={MdOutlineSpaceDashboard} label="Overview" />
       <SidebarItem icon={MdPlaylistPlay} label="Video Segmentation" />
-      <Spacer />
       <SidebarLinkItem
         icon={PiCubeFocus}
         label="Submit Feedback"
         href="https://docs.google.com/forms/d/e/1FAIpQLSf1Kw7wDDunRf_8CHbMRMd22jARr3Y9uaMvQCOl64U95lzbuQ/viewform?usp=sf_link"
       />
-    </VStack>
+    </Flex>
   );
 }
 

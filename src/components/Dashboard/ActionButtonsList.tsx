@@ -25,6 +25,7 @@ function ActionButton({
       variant="actionButton"
       onClick={handleClick}
       isDisabled={isDisabled}
+      size={['sm', 'lg']}
     >
       <Icon as={icon} fontSize="20" />
     </Button>
@@ -45,7 +46,7 @@ function ActionButtonList() {
 
   return (
     <SimpleGrid
-      columns={[4, 2]}
+      columns={[7, 4, 2]}
       height="max-content"
       spacing="4"
       position="absolute"

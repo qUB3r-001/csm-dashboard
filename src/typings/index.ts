@@ -6,5 +6,7 @@ export interface Point {
 export interface MarkedDots {
   x: number;
   y: number;
+  realX: number;
+  realY: number;
   loc: 'BACKGROUND' | 'OBJECT';
 }

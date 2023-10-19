@@ -11,6 +11,7 @@ function Footer() {
 
   return (
     <Flex
+      display={['none', 'none', 'none', 'block']}
       borderTop="2px"
       height={['12', '12', '12', '24']}
       fontSize={['3xs', 'inherit']}

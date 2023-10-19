@@ -22,6 +22,8 @@ function Dashboard() {
     panOffset,
     scale,
     uploadImageUrl,
+    tlPos,
+    setupInitialOffsetAndScale,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
@@ -42,39 +44,46 @@ function Dashboard() {
         const ctx = canvasElem.getContext('2d')!;
         canvasElem.height = containerRef.current.clientHeight;
         canvasElem.width = containerRef.current.clientWidth;
-        // ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-        ctx.scale(scale, scale);
 
         if (uploadImageUrl) {
           const loadImage = new Image();
           loadImage.src = uploadImageUrl;
+          const { startingImageWidth, startingImageHeight } =
+            setupInitialOffsetAndScale(canvasElem, loadImage);
 
-          loadImage.onload = () => {
-            const newImageWidth = 300;
-            const newImageHeight = (300 * loadImage.height) / loadImage.width;
-            console.log('image redrawn');
+          if (!imageRef.current) {
+            loadImage.onload = () => {
+              console.log('image redrawn');
+            };
+          } else {
+            // ctx.translate(tlPos.x, tlPos.y);
+            // ctx.scale(scale, scale);
+            // ctx.translate(-tlPos.x, -tlPos.y);
+
             ctx.drawImage(
               loadImage,
               panOffset.x,
               panOffset.y,
-              newImageWidth,
-              newImageHeight,
+              startingImageWidth,
+              startingImageHeight,
             );
-            imageRef.current = loadImage;
 
             markedDots.map((dot) => {
               ctx.fillStyle = dot.loc === 'OBJECT' ? '#42CF00' : '#DC3545';
               ctx.beginPath();
               ctx.arc(
-                dot.x + panOffset.x,
-                dot.y + panOffset.y,
+                dot.realX + panOffset.x, // render correctly instead of updating state
+                dot.realY + panOffset.y,
                 10,
                 0,
                 Math.PI * 2,
               );
               ctx.fill();
             });
-          };
+
+            // top left of the canvas to the offset amount
+          }
+          imageRef.current = loadImage;
         }
 
         if (isMaskGenerated && maskedImageUrl) {
@@ -115,6 +124,7 @@ function Dashboard() {
     uploadImageUrl,
     maskedImageUrl,
     handleMouseScroll,
+    setupInitialOffsetAndScale,
   ]);
 
   return (

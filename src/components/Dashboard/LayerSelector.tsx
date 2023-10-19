@@ -20,11 +20,11 @@ function LayerSelector() {
       <Switch
         color="transparent"
         variant="doubleColor"
-        size="lg"
+        size={['md', 'lg']}
         onChange={toggleObjectLayer}
         isChecked={isObjectLayer}
       />
-      <Text fontWeight="semibold">
+      <Text fontWeight="semibold" fontSize={['2xs', 'sm']}>
         {isObjectLayer ? 'Object' : 'Background'}
       </Text>
     </VStack>
