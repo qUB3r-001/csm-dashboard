@@ -36,8 +36,7 @@ interface ImageEditorContextProps {
   isObjectLayer: boolean;
   uploadImageUrl: string | null;
   maskedImageUrl: string | null;
-  tlPos: Point;
-  lastTLPosRef: MutableRefObject<Point>;
+  mousePos: Point;
   setupInitialOffsetAndScale: (
     canvasElem: HTMLCanvasElement,
     loadImage: HTMLImageElement,
@@ -66,7 +65,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const lastTLPosRef = useRef<Point>({ x: 0, y: 0 });
 
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
     'https://i.imgur.com/VQWyTaJ.jpeg',
@@ -77,10 +75,6 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
 
-  const [tlPos, setTlPos] = useState<Point>({
-    x: 0,
-    y: 0,
-  });
   const [panOffset, setPanOffset] = useState<Point>({
     x: 0,
     y: 0,
@@ -148,15 +142,12 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
 
       const relativeMousePos: Point = {
         x:
-          (e.clientX -
-            canvasRef.current!.getBoundingClientRect().left -
-            panOffset.x) /
-          scale,
+          (e.clientX - canvasRef.current!.getBoundingClientRect().left) /
+            scale -
+          panOffset.x,
         y:
-          (e.clientY -
-            canvasRef.current!.getBoundingClientRect().top -
-            panOffset.y) /
-          scale,
+          (e.clientY - canvasRef.current!.getBoundingClientRect().top) / scale -
+          panOffset.y,
       };
 
       if (isMarkingEnabled) {
@@ -240,22 +231,15 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const handleMouseScroll = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
-      console.log(scale, lastTLPosRef.current, tlPos);
-
-      lastTLPosRef.current = tlPos;
 
       if (isPanningEnabled) {
         const zoom = 1 - e.deltaY / 1500;
+        const currentScale = scale * zoom;
 
-        setScale(scale * zoom);
-
-        setTlPos({
-          x: e.clientX - canvasRef.current!.getBoundingClientRect().left,
-          y: e.clientY - canvasRef.current!.getBoundingClientRect().top,
-        });
+        setScale(currentScale);
       }
     },
-    [isPanningEnabled, scale, tlPos],
+    [isPanningEnabled, scale],
   );
 
   // action button based toggle events
@@ -346,8 +330,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
-      tlPos,
-      lastTLPosRef,
+      mousePos,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
@@ -379,8 +362,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
-      tlPos,
-      lastTLPosRef,
+      mousePos,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,

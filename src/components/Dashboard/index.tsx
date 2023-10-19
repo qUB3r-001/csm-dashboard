@@ -22,7 +22,7 @@ function Dashboard() {
     panOffset,
     scale,
     uploadImageUrl,
-    tlPos,
+    mousePos,
     setupInitialOffsetAndScale,
     handleMouseDown,
     handleMouseMove,
@@ -50,15 +50,28 @@ function Dashboard() {
           loadImage.src = uploadImageUrl;
           const { startingImageWidth, startingImageHeight } =
             setupInitialOffsetAndScale(canvasElem, loadImage);
+          const transformPoint = ctx
+            .getTransform()
+            .invertSelf()
+            .transformPoint({
+              x: mousePos.x - canvasElem.getBoundingClientRect().left,
+              y: mousePos.y - canvasElem.getBoundingClientRect().top,
+            });
+          console.log(transformPoint);
 
           if (!imageRef.current) {
             loadImage.onload = () => {
               console.log('image redrawn');
+              ctx.drawImage(
+                loadImage,
+                panOffset.x,
+                panOffset.y,
+                startingImageWidth,
+                startingImageHeight,
+              );
             };
           } else {
-            ctx.translate(tlPos.x, tlPos.y);
             ctx.scale(scale, scale);
-            ctx.translate(-tlPos.x, -tlPos.y);
 
             ctx.drawImage(
               loadImage,
@@ -125,8 +138,8 @@ function Dashboard() {
     maskedImageUrl,
     handleMouseScroll,
     setupInitialOffsetAndScale,
-    tlPos.x,
-    tlPos.y,
+    mousePos.x,
+    mousePos.y,
   ]);
 
   return (
