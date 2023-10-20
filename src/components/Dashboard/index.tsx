@@ -51,17 +51,32 @@ function Dashboard() {
             setupInitialOffsetAndScale(canvasElem, loadImage);
 
           if (!imageRef.current) {
-            loadImage.onload = () => {
-              console.log('image redrawn');
-              ctx.drawImage(
-                loadImage,
-                panOffset.x,
-                panOffset.y,
-                startingImageWidth,
-                startingImageHeight,
+            console.log('first paint', loadImage.complete);
+
+            if (loadImage.complete) {
+              loadImage.onload = () => {
+                console.log('image redrawn', loadImage.complete);
+                imageRef.current = loadImage;
+
+                ctx.drawImage(
+                  loadImage,
+                  panOffset.x,
+                  panOffset.y,
+                  startingImageWidth,
+                  startingImageHeight,
+                );
+              };
+            } else {
+              ctx.fillStyle = 'black';
+              ctx.fillText(
+                'Loading...',
+                canvasElem.width / 2,
+                canvasElem.height / 2,
               );
-            };
+            }
           } else {
+            console.log('second paint');
+
             ctx.scale(scale, scale);
 
             ctx.drawImage(
@@ -87,7 +102,6 @@ function Dashboard() {
 
             // top left of the canvas to the offset amount
           }
-          imageRef.current = loadImage;
         }
 
         if (isMaskGenerated && maskedImageUrl) {
