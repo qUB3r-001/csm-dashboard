@@ -36,7 +36,7 @@ interface ImageEditorContextProps {
   isObjectLayer: boolean;
   uploadImageUrl: string | null;
   maskedImageUrl: string | null;
-  mousePos: Point;
+  lastTlPosRef: MutableRefObject<Point>;
   setupInitialOffsetAndScale: (
     canvasElem: HTMLCanvasElement,
     loadImage: HTMLImageElement,
@@ -65,6 +65,10 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const lastTlPosRef = useRef<Point>({
+    x: 0,
+    y: 0,
+  });
 
   const [uploadImageUrl, setUploadImageUrl] = useState<string | null>(
     'https://i.imgur.com/VQWyTaJ.jpeg',
@@ -232,10 +236,15 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
     (e: WheelEvent) => {
       e.preventDefault();
 
+      console.log(e.offsetX, scale, e.offsetY);
       if (isPanningEnabled) {
-        const zoom = 1 - e.deltaY / 1500;
+        const zoom = e.deltaY > 0 ? 0.95 : 1.05;
         const currentScale = scale * zoom;
 
+        lastTlPosRef.current = {
+          x: e.offsetX,
+          y: e.offsetY,
+        };
         setScale(currentScale);
       }
     },
@@ -330,7 +339,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
-      mousePos,
+      lastTlPosRef,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,
@@ -362,7 +371,7 @@ export function ImageEditorProvider({ children }: { children: ReactNode }) {
       scale,
       uploadImageUrl,
       maskedImageUrl,
-      mousePos,
+      lastTlPosRef,
       setupInitialOffsetAndScale,
       handleImageUpload,
       deleteImageUpload,

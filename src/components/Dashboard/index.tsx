@@ -22,7 +22,6 @@ function Dashboard() {
     panOffset,
     scale,
     uploadImageUrl,
-    mousePos,
     setupInitialOffsetAndScale,
     handleMouseDown,
     handleMouseMove,
@@ -50,14 +49,6 @@ function Dashboard() {
           loadImage.src = uploadImageUrl;
           const { startingImageWidth, startingImageHeight } =
             setupInitialOffsetAndScale(canvasElem, loadImage);
-          const transformPoint = ctx
-            .getTransform()
-            .invertSelf()
-            .transformPoint({
-              x: mousePos.x - canvasElem.getBoundingClientRect().left,
-              y: mousePos.y - canvasElem.getBoundingClientRect().top,
-            });
-          console.log(transformPoint);
 
           if (!imageRef.current) {
             loadImage.onload = () => {
@@ -74,7 +65,7 @@ function Dashboard() {
             ctx.scale(scale, scale);
 
             ctx.drawImage(
-              loadImage,
+              imageRef.current,
               panOffset.x,
               panOffset.y,
               startingImageWidth,
@@ -138,8 +129,6 @@ function Dashboard() {
     maskedImageUrl,
     handleMouseScroll,
     setupInitialOffsetAndScale,
-    mousePos.x,
-    mousePos.y,
   ]);
 
   return (
